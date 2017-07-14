@@ -5,10 +5,12 @@
 > npm install bugreport
 
 ## 配置
-> var report=require('bugreport');
-> report.config({
+``` 
+var report=require('bugreport')
+report.config({
     reportUrl: '' //上报的URL
 })
+```
 
-### 手动上报
+## 手动上报
 > report.report(msg)
