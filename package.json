@@ -1,0 +1,21 @@
+{
+    "name": "bugreport",
+    "version": "1.0.0",
+    "description": "bugreport",
+    "dependencies": {},
+    "main": "./dist/index.js",
+    "repository": {
+        "type": "Git",
+        "url": "https://github.com/mLiveFE/bugReport.git"
+    },
+    "scripts": {
+        "build": "webpack"
+    },
+    "devDependencies": {
+        "babel-eslint": "^7.2.3",
+        "eslint": "^4.2.0",
+        "eslint-loader": "^1.9.0",
+        "request": "^2.81.0",
+        "webpack": "^3.2.0"
+    }
+}

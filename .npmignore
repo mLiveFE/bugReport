@@ -1,0 +1,6 @@
+src/**
+.eslintignore
+.eslintrc.js
+webpack.config.js
+yarn.lock
+test/**
