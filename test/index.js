@@ -1,7 +1,6 @@
 var defaultOptions = {
-    reportUrl: 'http://localhost:8092/api/bug/handleBugReport',
-    reportKey: 'mlrMsg',
-    port: 0
+    reportUrl: '',
+    reportKey: 'mlrMsg'
 }
 var env = (typeof window !== 'undefined') ? 'browser' : 'node'
 
@@ -16,18 +15,12 @@ function report(errorMsg, type) {
         var url = defaultOptions.reportUrl + '?' + defaultOptions.reportKey + '=' + errorMsg + '&type=' + type + '&from=' + env + '&time=' + new Date().getTime()
         if (env === 'browser') {
             url += '&env=' + encodeURIComponent(navigator.userAgent)
+            console.log("==>" + errorMsg)
             new Image().src = url
         } else {
             url += '&env=' + encodeURIComponent(global.process.version)
-            if (defaultOptions.ip && defaultOptions.port) {
-                var http = require('http')
-                var URL = require('url')
-                var options = URL.parse(url)
-                options.headers = {
-                    referer: defaultOptions.ip + ':' + defaultOptions.port
-                }
-                http.get(options)
-            }
+            var http = require('http')
+            http.get(url)
         }
     }
 }
@@ -42,6 +35,7 @@ bugReport.config = function (options) {
 // bugReport.report = function (msg) {
 //     report(msg, 2)
 // }
+
 if (env === 'browser') {
     window.onerror = function (msg, url, line, col, error) {
         if (msg.toLowerCase().indexOf('script error') > -1) {
@@ -50,29 +44,16 @@ if (env === 'browser') {
         if (error && error.stack) {
             var stack = error.stack.replace(/\n/gi, '').split(/\bat\b/).slice(0, 9).join('@').replace(/\?[^:]+/gi, '')
             msg = (msg + '(' + url + ':' + line + ':' + col + ')' + '@' + stack).substr(0, 1000)
+            console.log('*******' + msg)
         }
         report(msg, 1)
     }
 } else {
-    defaultOptions.ip = getIPAdress()
     global.process.on('uncaughtException', function (error) {
         if (error && error.stack) {
             error = error.stack.toString().replace(/\n/gi, '').split(/\bat\b/).slice(0, 9).join('@').replace(/\?[^:]+/gi, '')
             report(error, 1)
         }
     })
-}
-
-function getIPAdress() {
-    var interfaces = require('os').networkInterfaces()
-    for (var devName in interfaces) {
-        var iface = interfaces[devName]
-        for (var i = 0; i < iface.length; i++) {
-            var alias = iface[i]
-            if (alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal) {
-                return alias.address
-            }
-        }
-    }
 }
 module.exports = bugReport
