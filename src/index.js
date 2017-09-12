@@ -24,7 +24,7 @@ function report(errorMsg, type) {
                 var URL = require('url')
                 var options = URL.parse(url)
                 options.headers = {
-                    referer: defaultOptions.ip + ':' + defaultOptions.port
+                    referer: 'http://' + defaultOptions.ip + ':' + defaultOptions.port
                 }
                 http.get(options)
             }
@@ -39,9 +39,12 @@ bugReport.config = function (options) {
         }
     }
 }
-// bugReport.report = function (msg) {
-//     report(msg, 2)
-// }
+bugReport.report = function (error) {
+    if (error && error.stack) {
+        error = error.stack.toString().replace(/\n/gi, '').split(/\bat\b/).slice(0, 9).join('@').replace(/\?[^:]+/gi, '')
+        report(error, 1)
+    }
+}
 if (env === 'browser') {
     window.onerror = function (msg, url, line, col, error) {
         if (msg.toLowerCase().indexOf('script error') > -1) {
@@ -64,15 +67,20 @@ if (env === 'browser') {
 }
 
 function getIPAdress() {
-    var interfaces = require('os').networkInterfaces()
-    for (var devName in interfaces) {
-        var iface = interfaces[devName]
-        for (var i = 0; i < iface.length; i++) {
-            var alias = iface[i]
-            if (alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal) {
-                return alias.address
+    try {
+        var interfaces = require('os').networkInterfaces()
+        for (var devName in interfaces) {
+            var iface = interfaces[devName]
+            for (var i = 0; i < iface.length; i++) {
+                var alias = iface[i]
+                if (alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal) {
+                    return alias.address
+                }
             }
         }
+    } catch (error) {
+        return ''
     }
+
 }
 module.exports = bugReport

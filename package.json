@@ -1,6 +1,6 @@
 {
     "name": "bugreport",
-    "version": "1.0.4",
+    "version": "1.0.7",
     "description": "bugreport",
     "dependencies": {},
     "main": "./dist/index.js",
